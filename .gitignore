@@ -1,5 +1,13 @@
 *.iml
 .gradle
+.idea
+
+# Java class files
+*.class
+
+# Built application files
+/*/build/
+
 /local.properties
 /.idea/caches
 /.idea/libraries

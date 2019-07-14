@@ -6,6 +6,9 @@ import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
 
+/**
+ * @author Zamanov Nizami
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
