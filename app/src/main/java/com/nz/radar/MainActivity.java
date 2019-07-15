@@ -1,7 +1,10 @@
 package com.nz.radar;
 
+import android.content.Intent;
+import android.graphics.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
@@ -22,4 +25,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "opencv load failed", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void whenGoToCameraActivityButtonPressed(final View view) {
+        final Intent intent = new Intent(this, CameraActivity.class);
+        startActivity(intent);
+    }
+
 }
