@@ -10,12 +10,22 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
+
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 public class CameraActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String TAG = "OpenCVCamera";
     private CameraBridgeViewBase cameraBridgeViewBase;
+
+    Mat mRgba =  new Mat();
+    Mat mRgb = new Mat();
+    Mat mHsv = new Mat();
+    Mat mMask = new Mat();
+    Mat mResult = new Mat();
 
     private BaseLoaderCallback baseLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -54,6 +64,8 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
     }
     @Override
     public void onCameraViewStarted(int width, int height) {
+        Log.e(TAG, "@______@__________@________@________@camera started");
+        Log.e(TAG, "width=" + width + ", height=" + height);
 
     }
 
@@ -64,7 +76,36 @@ public class CameraActivity extends AppCompatActivity implements CameraBridgeVie
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return inputFrame.rgba();
+        mRgba =  inputFrame.rgba();
+
+
+
+
+        Imgproc.cvtColor(mRgba, mRgb, Imgproc.COLOR_RGBA2RGB);
+        Imgproc.cvtColor(mRgb, mHsv, Imgproc.COLOR_RGB2HSV, 3);
+//        Imgproc.cvtColor(mHsv, mRgba, Imgproc.COLOR_RGB2RGBA, 4);
+//        Imgproc.cvtColor(mHsv, mRgb, Imgproc.COLOR_HSV2RGB, 3);
+//        Imgproc.cvtColor(mRgb, mRgba, Imgproc.COLOR_RGB2RGBA);
+//        Imgproc.cvtColor(mRgba, mHsv, Imgproc.COLOR_RGB2HSV_FULL);
+
+        // Convert to HSV
+//        Mat hsvFrame = new Mat(mRgb.rows(), mRgb.cols(), CvType.CV_8U, new Scalar(3));
+//        Imgproc.cvtColor(mRgb, hsvFrame, Imgproc.COLOR_RGB2HSV, 3);
+
+//
+//
+        Scalar lowerBound = new Scalar(11, 0, 0);
+        Scalar upperBound = new Scalar(179, 218, 213);
+//
+        Core.inRange(mHsv, lowerBound, upperBound, mMask);
+        Core.bitwise_and(mRgb, mRgb, mResult, mMask);
+//        Core.bitwise_and(mRgba, mRgba, mResult, mMask);
+//
+        Imgproc.cvtColor(mResult, mRgba, Imgproc.COLOR_BGR2RGBA);
+//        Imgproc.cvtColor(mRgb, result, Imgproc.COLOR_RGB2RGBA);
+//        return mRgb;
+        return mRgba;
+
     }
 
 //    private CameraBridgeViewBase mOpenCvCameraView;
