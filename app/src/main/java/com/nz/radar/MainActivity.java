@@ -31,4 +31,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void whenGoToCalibrationActivityButtonPressed(final View view) {
+        final Intent intent = new Intent(this, Calibration.class);
+        startActivity(intent);
+    }
+
 }

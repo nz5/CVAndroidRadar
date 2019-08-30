@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_opencv_calibration"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/opencv_camera_view_calibration"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        opencv:camera_id="any"
+        opencv:show_fps="true" />
+
+    <SeekBar
+        android:id="@+id/seekBar-h-high"
+        android:layout_width="262dp"
+        android:layout_height="28dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="419dp"
+        android:layout_marginLeft="419dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar-h-low"
+        android:layout_width="262dp"
+        android:layout_height="28dp"
+        android:layout_below="@+id/seekBar-h-high"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="420dp"
+        android:layout_marginLeft="420dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar-s-high"
+        android:layout_width="262dp"
+        android:layout_height="28dp"
+        android:layout_below="@+id/seekBar-h-low"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="419dp"
+        android:layout_marginLeft="419dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar-s-low"
+        android:layout_width="262dp"
+        android:layout_height="28dp"
+        android:layout_below="@+id/seekBar-s-high"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="419dp"
+        android:layout_marginLeft="419dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar-v-high"
+        android:layout_width="262dp"
+        android:layout_height="28dp"
+        android:layout_below="@+id/seekBar-s-low"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="420dp"
+        android:layout_marginLeft="420dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginRight="50dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar-v-low"
+        android:layout_width="262dp"
+        android:layout_height="28dp"
+        android:layout_below="@+id/seekBar-v-high"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="421dp"
+        android:layout_marginLeft="421dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginRight="50dp" />
+
+    <TextView
+        android:id="@+id/textView-hhigh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="359dp"
+        android:layout_marginLeft="359dp"
+        android:layout_marginTop="35dp"
+        android:text="hhigh" />
+
+    <TextView
+        android:id="@+id/textView-hlow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="361dp"
+        android:layout_marginLeft="361dp"
+        android:layout_marginTop="93dp"
+        android:text="hlow" />
+
+    <TextView
+        android:id="@+id/textView-shigh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="359dp"
+        android:layout_marginLeft="359dp"
+        android:layout_marginTop="151dp"
+        android:text="shigh" />
+
+    <TextView
+        android:id="@+id/textView-slow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="359dp"
+        android:layout_marginLeft="359dp"
+        android:layout_marginTop="210dp"
+        android:text="slow" />
+
+    <TextView
+        android:id="@+id/textView-vhigh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="361dp"
+        android:layout_marginLeft="361dp"
+        android:layout_marginTop="268dp"
+        android:text="vhigh" />
+
+    <TextView
+        android:id="@+id/textView-vlow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="361dp"
+        android:layout_marginLeft="361dp"
+        android:layout_marginTop="327dp"
+        android:text="vlow" />
+
+    <SeekBar
+        android:id="@+id/seekBar-erode"
+        android:layout_width="211dp"
+        android:layout_height="31dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="262dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar-dilate"
+        android:layout_width="211dp"
+        android:layout_height="31dp"
+        android:layout_below="@+id/seekBar-erode"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="18dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/textView-erode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="238dp"
+        android:layout_marginLeft="238dp"
+        android:layout_marginTop="268dp"
+        android:text="erode" />
+
+    <TextView
+        android:id="@+id/textView-dilate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="238dp"
+        android:layout_marginLeft="238dp"
+        android:layout_marginTop="327dp"
+        android:text="dilate" />
+
+
+</RelativeLayout>
