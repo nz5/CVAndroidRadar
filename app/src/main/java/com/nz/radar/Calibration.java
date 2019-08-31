@@ -218,8 +218,6 @@ public class Calibration extends AppCompatActivity implements CameraBridgeViewBa
             return mMask;
         }
 
-//        int erosion_size = 5;
-//        int dilation_size = 5;
         Mat strcuturingElementErode = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size+1));
         Mat strcuturingElementDilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
         Imgproc.erode(mMask, mErode, strcuturingElementErode);
