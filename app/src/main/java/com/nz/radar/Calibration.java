@@ -2,8 +2,11 @@ package com.nz.radar;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -13,9 +16,15 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Calibration extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
@@ -29,12 +38,20 @@ public class Calibration extends AppCompatActivity implements CameraBridgeViewBa
     private static final String ERODE_TEXT = "Erode: ";
     private static final String DILATE_TEXT = "Dilate: ";
 
-    private int erosion_size = 5;
-    private int dilation_size = 5;
+
 
     JavaCameraView javaCameraView;
     Mat mHsv, mMask, mOriginal, mat4, mGaussianBlue, mErode, mDilate;
     Scalar scalarLow, scalarHigh;
+    private int erosion_size = 5;
+    private int dilation_size = 5;
+    private boolean blurView = false;
+    private boolean blackWhiteView = true;
+    private boolean hsvView = false;
+    private boolean hsvMaskView = false;
+    private boolean outputView = false;
+
+    private RadioGroup radioGroup;
 
     private SeekBar hHigh;
     private SeekBar hLow;
@@ -71,6 +88,66 @@ public class Calibration extends AppCompatActivity implements CameraBridgeViewBa
         scalarHigh = new Scalar(75, 255, 255);
 
         configureSeekBars();
+        configureRadioButtons();
+    }
+
+    private void configureRadioButtons(){
+        radioGroup = findViewById(R.id.radio_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton radioButton = findViewById(checkedId);
+                final String radioTextValue = radioButton.getText().toString();
+                switch (radioTextValue){
+                    case "blur":
+                        blurView = true;
+                        blackWhiteView = false;
+                        hsvView = false;
+                        hsvMaskView = false;
+                        outputView = false;
+                        break;
+
+                    case "black":
+                        blurView = false;
+                        blackWhiteView = true;
+                        hsvView = false;
+                        hsvMaskView = false;
+                        outputView = false;
+                        break;
+
+                    case "hsv":
+                        blurView = false;
+                        blackWhiteView = false;
+                        hsvView = true;
+                        hsvMaskView = false;
+                        outputView = false;
+                        break;
+
+                    case "hsv-mask":
+                        blurView = false;
+                        blackWhiteView = false;
+                        hsvView = false;
+                        hsvMaskView = true;
+                        outputView = false;
+                        break;
+
+                    case "output":
+                        blurView = false;
+                        blackWhiteView = false;
+                        hsvView = false;
+                        hsvMaskView = false;
+                        outputView = true;
+                        break;
+
+                    default:
+                        blurView = false;
+                        blackWhiteView = true;
+                        hsvView = false;
+                        hsvMaskView = false;
+                        outputView = false;
+                }
+            }
+        });
     }
 
     private void configureSeekBars(){
@@ -125,9 +202,21 @@ public class Calibration extends AppCompatActivity implements CameraBridgeViewBa
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mOriginal = inputFrame.rgba();
+
         Imgproc.GaussianBlur(mOriginal, mOriginal,new Size(15,15), 0);
+        if (blurView) {
+            return mOriginal;
+        }
+
         Imgproc.cvtColor(mOriginal, mHsv, Imgproc.COLOR_BGR2HSV);
+        if (hsvView) {
+            return mHsv;
+        }
+
         Core.inRange(mHsv, scalarLow, scalarHigh, mMask);
+        if (hsvMaskView) {
+            return mMask;
+        }
 
 //        int erosion_size = 5;
 //        int dilation_size = 5;
@@ -135,12 +224,28 @@ public class Calibration extends AppCompatActivity implements CameraBridgeViewBa
         Mat strcuturingElementDilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
         Imgproc.erode(mMask, mErode, strcuturingElementErode);
         Imgproc.dilate(mErode, mDilate, strcuturingElementDilate);
-        return mDilate;
+        if (blackWhiteView) {
+            return mDilate;
+        }
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(mDilate, contours, mat4, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Log.w(TAG, "--------------------------contour length=" + contours.size());
+        int maxIndex = 0;
+        double maxArea = 0;
+        for (int i=0; i < contours.size(); i++) {
+            double tempArea = Imgproc.contourArea(contours.get(i));
+            if (tempArea > maxArea) {
+                maxArea = tempArea;
+                maxIndex = i;
+                Rect rect = Imgproc.boundingRect(contours.get(i));
+                Imgproc.rectangle(mOriginal, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(0,255,0));
+            }
+        }
+        return mOriginal;
     }
 
     private void setSeekBarListeners(){
-
-
         textErode = findViewById(R.id.textView_erode);
         textErode.setText(ERODE_TEXT.concat(String.valueOf(erode.getProgress())));
         erode.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -182,8 +287,6 @@ public class Calibration extends AppCompatActivity implements CameraBridgeViewBa
 
             }
         });
-
-
 
         textHHigh = findViewById(R.id.textView_hhigh);
         textHHigh.setText(H_HIGH.concat(String.valueOf(hHigh.getProgress())));
