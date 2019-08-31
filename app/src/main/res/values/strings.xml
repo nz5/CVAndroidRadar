@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CVBallRadar</string>
+
+    <!--for MAIN activity screen-->
+    <string name="button_go_camera_activity">Go to camera</string>
+    <string name="button_go_calibration_activity">Go to calibration</string>
 </resources>

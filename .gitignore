@@ -1,6 +1,8 @@
 *.iml
 .gradle
 .idea
+*.jar
+*.json
 
 # Java class files
 *.class
