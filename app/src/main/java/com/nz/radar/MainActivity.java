@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.nz.radar.recording.CameraAbsDiffActivity;
+
 import org.opencv.android.OpenCVLoader;
 
 /**
@@ -28,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void whenGoToCameraActivityButtonPressed(final View view) {
         final Intent intent = new Intent(this, CameraActivity.class);
+        startActivity(intent);
+    }
+
+    public void whenGoToCameraAbsDiffButtonPressed(final View view) {
+        final Intent intent = new Intent(this, CameraAbsDiffActivity.class);
         startActivity(intent);
     }
 
