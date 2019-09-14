@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">CVBallRadar</string>
+    <string name="app_name">Ball Speed NZ</string>
 
     <!--for MAIN activity screen-->
-    <string name="button_go_camera_activity">Go to camera</string>
+    <string name="button_go_camera_activity">Measure with\nHSV</string>
+    <string name="button_go_camera_absDiff_activity">Measure with\nAbsDiff</string>
     <string name="button_go_calibration_activity">Go to calibration</string>
+    <string name="switch_direction">Shooting from left?</string>
 </resources>
