@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
+import com.nz.radar.Common;
 import com.nz.radar.R;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -29,6 +32,17 @@ public class CameraAbsDiffActivity extends AppCompatActivity implements CameraBr
 
     private static final String TAG = "OpenCVCamera";
 
+    private RadioGroup radioGroupView;
+    private RadioGroup radioGroupShape;
+
+    private boolean radioBlackWhite = true;
+    private boolean radioOriginal = false;
+    private boolean radioCircle = false;
+    private boolean radioRectangle = true;
+
+
+
+
     JavaCameraView javaCameraView;
     Mat mHsv, mMask, mOriginal, mat4, mGaussianBlue, mErode, mDilate;
     Mat frame1, frame2, frame3, delta1, delta2, delta1Thresh, delta2Thresh, melta1, melta2;
@@ -36,13 +50,10 @@ public class CameraAbsDiffActivity extends AppCompatActivity implements CameraBr
     Mat houghCircle;
     Scalar scalarLow, scalarHigh;
     int counter;
-    List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
-    private static int GOAL_LINE_WIDTH = 3;
-    private static int GOAL_LINE_MARGIN_X = 70;
-    private static int GOAL_LINE_MARGIN_Y = 50;
 
-    private boolean rightToLeft = true;
+    private boolean isLeftToRight;
+    private int ballToGoalDistance;
 
 
     @Override
@@ -57,11 +68,75 @@ public class CameraAbsDiffActivity extends AppCompatActivity implements CameraBr
         javaCameraView.setCvCameraViewListener(this);
         javaCameraView.enableView();
 
+        isLeftToRight = getIntent().getExtras().getBoolean(Common.LEFT_TO_RIGHT);
+        ballToGoalDistance = getIntent().getExtras().getInt(Common.DISTANCE);
+
+        configureRadioButtons();
+
         scalarLow = new Scalar(45, 20, 10);
         scalarHigh = new Scalar(75, 255, 255);
     }
 
-    @Override
+    private void configureRadioButtons(){
+        radioGroupView = findViewById(R.id.absDiff_view);
+        radioGroupShape = findViewById(R.id.absDiff_shape);
+
+        final RadioButton radioButtonViewBlack = findViewById(R.id.radio_blackWhite);
+        radioButtonViewBlack.setChecked(false);
+        final RadioButton radioButtonViewOriginal = findViewById(R.id.radio_original);
+        radioButtonViewOriginal.setChecked(true);
+        final RadioButton radioButtonShapeRect = findViewById(R.id.radio_rectange);
+        radioButtonShapeRect.setChecked(true);
+        final RadioButton radioButtonShapeCircle = findViewById(R.id.radio_circle);
+        radioButtonShapeCircle.setChecked(false);
+
+        radioGroupView.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                final RadioButton radioButton = findViewById(checkedId);
+                final String radioTextValue = radioButton.getText().toString();
+                switch (radioTextValue){
+                    case "radio-blackWhite":
+                        radioBlackWhite = true;
+                        radioOriginal = false;
+                        Log.w(TAG, "--------------------------BLACK WHITE ");
+
+                        break;
+
+                    case "radio-original":
+                        radioBlackWhite = false;
+                        radioOriginal = true;
+                        Log.w(TAG, "--------------------------ORIGINAL ");
+
+                        break;
+
+                }
+            }
+        });
+
+        radioGroupShape.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                final RadioButton radioButton = findViewById(checkedId);
+                final String radioTextValue = radioButton.getText().toString();
+                switch (radioTextValue){
+                    case "radio-rectange":
+                        radioRectangle = true;
+                        radioCircle = false;
+                        Log.w(TAG, "--------------------------RECT ");
+                        break;
+
+                    case "radio-circle":
+                        radioRectangle = false;
+                        radioCircle = true;
+                        Log.w(TAG, "--------------------------CIRCLE ");
+                        break;
+                }
+            }
+        });
+    }
+
+            @Override
     protected void onPause() {
         super.onPause();
         javaCameraView.disableView();
@@ -109,16 +184,16 @@ public class CameraAbsDiffActivity extends AppCompatActivity implements CameraBr
     }
 
     private void drawGoalLine(Mat mat){
-        if (rightToLeft) {
+        if (!isLeftToRight) {
             Imgproc.line(mat,
-                    new Point(GOAL_LINE_MARGIN_X, GOAL_LINE_MARGIN_Y),
-                    new Point(GOAL_LINE_MARGIN_X, mat.height() - GOAL_LINE_MARGIN_Y),
-                    new Scalar(250, 255, 255), GOAL_LINE_WIDTH);
+                    new Point(Common.GOAL_LINE_MARGIN_X, Common.GOAL_LINE_MARGIN_Y),
+                    new Point(Common.GOAL_LINE_MARGIN_X, mat.height() - Common.GOAL_LINE_MARGIN_Y),
+                    new Scalar(250, 255, 255), Common.GOAL_LINE_THICKNESS);
         } else {
             Imgproc.line(mat,
-                    new Point(mat.width() - GOAL_LINE_MARGIN_X, GOAL_LINE_MARGIN_Y),
-                    new Point(mat.width() - GOAL_LINE_MARGIN_X, mat.height() - GOAL_LINE_MARGIN_Y),
-                    new Scalar(250, 255, 255), GOAL_LINE_WIDTH);
+                    new Point(mat.width() - Common.GOAL_LINE_MARGIN_X, Common.GOAL_LINE_MARGIN_Y),
+                    new Point(mat.width() - Common.GOAL_LINE_MARGIN_X, mat.height() - Common.GOAL_LINE_MARGIN_Y),
+                    new Scalar(250, 255, 255), Common.GOAL_LINE_THICKNESS);
         }
     }
 
@@ -146,62 +221,58 @@ public class CameraAbsDiffActivity extends AppCompatActivity implements CameraBr
 
         drawGoalLine(delta1);
 
-        frame1 = frame2;
-        frame2 = frame3;
-        counter++;
-        return delta1;
+
+
+        final List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(delta1, contours, delta2, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+//        Log.w(TAG, "--------------------------contour length=" + contours.size());
+
+        if (radioBlackWhite) {
+            if (radioRectangle) {
+                drawBoundingBox(contours, delta1);
+
+            } else {
+                drawBoundingCircle(contours, delta1);
+            }
+            frame1 = frame2;
+            frame2 = frame3;
+            counter++;
+            return delta1;
+        } else {
+            if (radioRectangle) {
+                drawBoundingBox(contours, mOriginal);
+            } else {
+                drawBoundingCircle(contours, mOriginal);
+            }
+            frame1 = frame2;
+            frame2 = frame3;
+            counter++;
+            return mOriginal;
+        }
+
+//        frame1 = frame2;
+//        frame2 = frame3;
+//        counter++;
+//        return delta1;
     }
 
-//        Imgproc.threshold(delta2, delta2, 5, 255, Imgproc.THRESH_BINARY);
-//        Core.absdiff(delta1Thresh, delta2Thresh, melta1);
-//        Imgproc.threshold(melta1, melta2, 2, 255, Imgproc.THRESH_BINARY);
-//        Core.absdiff(delta1, delta2, delta1Thresh);
-//        Imgproc.threshold(delta1Thresh, delta2Thresh, 1, 255, Imgproc.THRESH_BINARY);
+    private void drawBoundingBox(final List<MatOfPoint> contours, final Mat mat){
+        for (int i=0; i < contours.size(); i++) {
+            Rect rect = Imgproc.boundingRect(contours.get(i));
+            Imgproc.rectangle(mat, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(255,255,255), Common.GOAL_LINE_THICKNESS);
+        }
+    }
 
+    private void drawBoundingCircle(final List<MatOfPoint> contours, final Mat mat){
+        float[] radius = new float[1];
+        Point center = new Point();
 
-//        Imgproc.Canny(delta1, canny, 1, 3, 3, false);
-//        Imgproc.HoughCircles(canny, houghCircle, Imgproc.HOUGH_GRADIENT, (double)canny.size().width/16, 2);
-//        Imgproc.findContours(delta1, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-//        double maxArea = 0;
-//        float[] radius = new float[1];
-//        Point center = new Point();
-//        for (int i = 0; i < contours.size(); i++) {
-//            MatOfPoint c = contours.get(i);
-//            if (Imgproc.contourArea(c) > maxArea) {
-//                MatOfPoint2f c2f = new MatOfPoint2f(c.toArray());
-//                Imgproc.minEnclosingCircle(c2f, center, radius);
-//            }
-//        }
-//        Imgproc.circle(mOriginal, center, (int)radius[0], new Scalar(255, 0, 0), 2);
+        for (int i = 0; i < contours.size(); i++) {
+            MatOfPoint c = contours.get(i);
+            MatOfPoint2f c2f = new MatOfPoint2f(c.toArray());
+            Imgproc.minEnclosingCircle(c2f, center, radius);
+            Imgproc.circle(mat, center, (int)radius[0], new Scalar(255, 255, 255), Common.GOAL_LINE_THICKNESS);
+        }
 
-
-
-//        Imgproc.cvtColor(mOriginal, mHsv, Imgproc.COLOR_BGR2HSV);
-//        Core.inRange(mHsv, scalarLow, scalarHigh, mMask);
-//        int erosion_size = 5;
-//        int dilation_size = 5;
-//        Mat strcuturingElementErode = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size+1));
-//        Mat strcuturingElementDilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
-//        Imgproc.erode(mMask, mErode, strcuturingElementErode);
-//        Imgproc.dilate(mErode, mDilate, strcuturingElementDilate);
-//
-//        List<MatOfPoint> contours = new ArrayList<>();
-//        Imgproc.findContours(mDilate, contours, mat4, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-//        Log.w(TAG, "--------------------------contour length=" + contours.size());
-//
-//        int maxIndex = 0;
-//        double maxArea = 0;
-//        for (int i=0; i < contours.size(); i++) {
-//            double tempArea = Imgproc.contourArea(contours.get(i));
-//            if (tempArea > maxArea) {
-//                maxArea = tempArea;
-//                maxIndex = i;
-//
-//                //TODO find max of bounding box and draw only that
-//                Rect rect = Imgproc.boundingRect(contours.get(i));
-//                Imgproc.rectangle(mOriginal, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(0,255,0));
-//            }
-//        }
-//
-//        return mOriginal;
+    }
 }

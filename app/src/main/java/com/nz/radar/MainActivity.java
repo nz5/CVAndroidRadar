@@ -21,10 +21,11 @@ import org.opencv.android.OpenCVLoader;
 public class MainActivity extends AppCompatActivity {
 
     private static final int INIT_DISTANCE = 5;
-    private static final int MAX_DISTANCE = 5;
+    private static final int MAX_DISTANCE = 15;
 
     private SeekBar seekBarDistance;
     private TextView seekBarText;
+    private int seekBarValue = INIT_DISTANCE;
 
     private Switch switchDirection;
     public boolean isLeftToRight = false;
@@ -39,13 +40,32 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "opencv load failed", Toast.LENGTH_SHORT).show();
         }
-
         setUserInputs();
+    }
+
+
+
+    public void whenGoToCameraActivityButtonPressed(final View view) {
+        final Intent intent = new Intent(this, CameraActivity.class);
+        startActivity(intent);
+    }
+
+    public void whenGoToCameraAbsDiffButtonPressed(final View view) {
+        final Intent intent = new Intent(this, CameraAbsDiffActivity.class);
+        intent.putExtra(Common.LEFT_TO_RIGHT, isLeftToRight);
+        intent.putExtra(Common.DISTANCE, seekBarValue);
+
+        startActivity(intent);
+    }
+
+    public void whenGoToCalibrationActivityButtonPressed(final View view) {
+        final Intent intent = new Intent(this, Calibration.class);
+        startActivity(intent);
     }
 
     private void setUserInputs(){
         seekBarDistance = findViewById(R.id.seekBar_distance);
-        seekBarDistance.setMax(15);
+        seekBarDistance.setMax(MAX_DISTANCE);
         seekBarDistance.setProgress(INIT_DISTANCE);
         seekBarText = findViewById(R.id.text_distance);
         seekBarText.setText(INIT_DISTANCE + " meters");
@@ -54,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 seekBarDistance.setProgress(progress);
                 seekBarText.setText(progress + " meters");
+                seekBarValue = progress;
             }
 
             @Override
@@ -73,24 +94,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isLeftToRight = isChecked;
-                System.out.println("--------------- " + isChecked);
             }
         });
-    }
-
-    public void whenGoToCameraActivityButtonPressed(final View view) {
-        final Intent intent = new Intent(this, CameraActivity.class);
-        startActivity(intent);
-    }
-
-    public void whenGoToCameraAbsDiffButtonPressed(final View view) {
-        final Intent intent = new Intent(this, CameraAbsDiffActivity.class);
-        startActivity(intent);
-    }
-
-    public void whenGoToCalibrationActivityButtonPressed(final View view) {
-        final Intent intent = new Intent(this, Calibration.class);
-        startActivity(intent);
     }
 
 }

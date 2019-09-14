@@ -16,4 +16,56 @@
         opencv:show_fps="true"
         opencv:camera_id="any"/>
 
+    <RadioGroup
+        android:id="@+id/absDiff-shape"
+        android:layout_width="123dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="18dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginBottom="22dp" >
+
+        <RadioButton
+            android:id="@+id/radio-rectange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rectangle" />
+
+        <RadioButton
+            android:id="@+id/radio-circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Circle" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/absDiff-view"
+        android:layout_width="122dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="151dp"
+        android:layout_marginLeft="151dp"
+        android:layout_marginBottom="22dp" >
+
+        <RadioButton
+            android:id="@+id/radio-blackWhite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Black-White" />
+
+        <RadioButton
+            android:id="@+id/radio-original"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Original" />
+    </RadioGroup>
+
 </RelativeLayout>
